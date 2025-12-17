@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-brn4n&t0n5*7mh@0#wta1tr8in#z1ia#8po2lvwlwy93us0s3w
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['http://smartcrops-backend.onrender.com']
 
 
 # Application definition
@@ -125,6 +125,7 @@ STATIC_URL = 'static/'
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
+    'http://smartcrops-backend.onrender.com'
 ]
 
 CORS_ALLOW_ALL_ORIGINS = True
