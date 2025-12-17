@@ -25,7 +25,11 @@ SECRET_KEY = 'django-insecure-brn4n&t0n5*7mh@0#wta1tr8in#z1ia#8po2lvwlwy93us0s3w
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['http://smartcrops-backend.onrender.com']
+ALLOWED_HOSTS = ['http://smartcrops-backend.onrender.com',
+                 "smartcrops-backend.onrender.com",
+                "localhost",
+                "127.0.0.1"
+]
 
 
 # Application definition
