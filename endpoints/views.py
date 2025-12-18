@@ -74,7 +74,22 @@ def analyze_crop(request):
 
         image.verify()  # Verify that it is, in fact, an image
 
-        analysis_result = mock_crop_analysis(image_file.name)
+        results = client.image_classification(image_data, model=MODEL_ID)
+
+        analysis_result = {
+            "issue": results[0]["label"],
+            "confidence": round(results[0]["score"], 2),
+            "recommendation": get_recommendations(results[0]["label"]),
+            "all_predictions": [
+                {
+                    "disease": r["label"],
+                    "confidence": round(r["score"], 2)
+                }
+                for r in results[:3]
+            ]
+        }
+        
+        # analysis_result = mock_crop_analysis(image_file.name)
 
         return Response({
             "analysis": analysis_result,
@@ -86,7 +101,7 @@ def analyze_crop(request):
             "error": "Invalid image file. Please upload a valid image."},
             status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
-def mock_crop_analysis(image_name):
+def get_recommendations(disease_name):
     """
     Mock function to simulate crop analysis.
     In a real implementation, this would involve ML model inference.
