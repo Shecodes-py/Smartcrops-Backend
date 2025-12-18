@@ -1,76 +1,110 @@
-SmartCrop Backend API
-Django REST API for SmartCrop crop disease detection system.
+# SmartCrop Backend API – Django REST API
 
-Features
-✅ Health check endpoint for deployment verification
-✅ Crop image analysis endpoint with mock disease detection
-✅ Image validation (JPG/PNG, size limits)
-✅ Swagger/OpenAPI documentation
-✅ CORS support for frontend integration
-✅ Comprehensive error handling
-✅ Unit tests included
+A backend API for the **SmartCrop Crop Disease Detection System**, built with Django REST Framework. It supports image-based crop disease detection (mocked for MVP) and includes robust error handling, Swagger documentation, and CORS support.
 
-Installation
-1. Create virtual environment
-bash
+---
+
+## Features ✅
+
+- Health check endpoint for deployment verification  
+- Crop image analysis endpoint (mock disease detection)  
+- Image validation (JPG/PNG, max 10MB)  
+- Swagger/OpenAPI documentation  
+- CORS support for frontend integration  
+- Comprehensive error handling  
+- Unit tests included  
+
+---
+
+## Installation
+
+### 1. Create a virtual environment
+
+```bash
 python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-2. Install dependencies
-bash
-pip install -r requirements.txt
-3. Configure Django project
-Create a new Django app if you haven't:
+source venv/bin/activate  # Windows: venv\Scripts\activate
+```
 
-bash
+### 2. Install dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+### 3. Configure Django project
+
+Create a Django project and app if not already done:
+
+```bash
 django-admin startproject smartcrop_project .
 python manage.py startapp smartcrop
+```
 
-4. Update settings
-Add the configuration from settings.py additions to your settings.py file.
+### 4. Update settings
 
-5. Update URLs
-Add the app URLs configuration to your app's urls.py
-Add the Swagger configuration to your project's main urls.py
+- Add the necessary app configuration to `settings.py`  
+- Add `CORS_ALLOWED_ORIGINS` for frontend integration:
 
-6. Run migrations
-bash
+```python
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",  # frontend URL
+]
+```
+
+### 5. Configure URLs
+
+- Add `smartcrop/urls.py` for the app  
+- Add Swagger/OpenAPI URLs in `smartcrop_project/urls.py`
+
+### 6. Run migrations
+
+```bash
 python manage.py migrate
+```
 
-7. Start the server
-bash
+### 7. Start the server
+
+```bash
 python manage.py runserver
-The server will start at http://localhost:8000
+```
 
-API Endpoints
-1. Health Check
-Endpoint: GET /health
+Access the API at: `http://localhost:8000`
 
-Purpose: Verify server is running
+---
 
-Response:
+## API Endpoints
 
-json
-{
-  "status": "OK"
-}
-Test:
+### 1. Health Check
 
-bash
+- **Endpoint:** `GET /health`  
+- **Purpose:** Verify the server is running  
+- **Response:**
+
+```json
+{ "status": "OK" }
+```
+
+- **Test with curl:**
+
+```bash
 curl http://localhost:8000/health
+```
 
-2. Analyze Crop
-Endpoint: POST /analyze
+---
 
-Purpose: Analyze crop image for diseases
+### 2. Analyze Crop Image
 
-Request:
+- **Endpoint:** `POST /analyze`  
+- **Purpose:** Analyze crop image for diseases  
+- **Request:** `multipart/form-data`
 
-Method: POST
-Content-Type: multipart/form-data
-Body: image file (JPG or PNG, max 10MB)
-Response:
+```http
+image: JPG/PNG file (max 10MB)
+```
 
-json
+- **Response Example:**
+
+```json
 {
   "issue": "Leaf blight",
   "confidence": 0.85,
@@ -80,116 +114,127 @@ json
     "Remove affected leaves"
   ]
 }
-Test with curl:
+```
 
-bash
+- **Test with curl:**
+
+```bash
 curl -X POST http://localhost:8000/analyze \
-  -F "image=@/path/to/crop_image.jpg"
-Test with Python:
+-F "image=@/path/to/crop_image.jpg"
+```
 
-python
+- **Test with Python:**
+
+```python
 import requests
 
 url = "http://localhost:8000/analyze"
 files = {'image': open('crop_image.jpg', 'rb')}
 response = requests.post(url, files=files)
 print(response.json())
-Error Responses
-Missing Image
-json
-{
-  "error": "No image file provided. Please upload an image."
-}
-Invalid File Type
-json
-{
-  "error": "Invalid file type. Only JPG and PNG images are allowed."
-}
-File Too Large
-json
-{
-  "error": "File size too large. Maximum size is 10MB."
-}
-Processing Error
-json
-{
-  "error": "Failed to process image: [error details]"
-}
+```
 
-Documentation
-Swagger UI
-Visit http://localhost:8000/docs/ for interactive API documentation
+---
 
-ReDoc
-Visit http://localhost:8000/redoc/ for alternative documentation view
+### Error Responses
 
-Testing
-Run the test suite:
+| Error Type          | Response |
+|--------------------|----------|
+| Missing Image       | `{ "error": "No image file provided. Please upload an image." }` |
+| Invalid File Type   | `{ "error": "Invalid file type. Only JPG and PNG images are allowed." }` |
+| File Too Large      | `{ "error": "File size too large. Maximum size is 10MB." }` |
+| Processing Error    | `{ "error": "Failed to process image: [error details]" }` |
 
-bash
+---
+
+## Documentation
+
+- **Swagger UI:** `http://localhost:8000/docs/`  
+- **ReDoc:** `http://localhost:8000/redoc/`
+
+---
+
+## Testing
+
+- Run all tests:
+
+```bash
 python manage.py test
-Run specific test class:
+```
 
-bash
+- Run specific tests:
+
+```bash
 python manage.py test smartcrop.tests.HealthCheckTestCase
 python manage.py test smartcrop.tests.AnalyzeCropTestCase
+```
 
-Project Structure
+---
+
+## Project Structure
+
+```
 smartcrop_project/
 ├── smartcrop/
 │   ├── __init__.py
-│   ├── views.py          # API endpoint implementations
-│   ├── urls.py           # URL routing
-│   ├── tests.py          # Unit tests
+│   ├── views.py       # API endpoint implementations
+│   ├── urls.py        # URL routing
+│   ├── tests.py       # Unit tests
 │   └── ...
 ├── smartcrop_project/
-│   ├── settings.py       # Django settings
-│   ├── urls.py           # Main URL configuration
+│   ├── settings.py    # Django settings
+│   ├── urls.py        # Main URL configuration
 │   └── ...
-├── requirements.txt      # Python dependencies
+├── requirements.txt   # Python dependencies
 └── manage.py
+```
 
-Frontend Integration
-The API supports CORS for frontend integration. Update CORS_ALLOWED_ORIGINS in settings.py with your frontend URL:
+---
 
-python
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",  # Your frontend URL
-]
+## Mock Analysis Logic
 
-Mock Analysis Logic
-The current implementation uses mock disease detection for MVP purposes. The mock_crop_analysis() function returns randomized results from a predefined disease database.
+- The current `mock_crop_analysis()` function returns randomized disease results for MVP.  
+- To integrate a real AI model:
+  1. Replace `mock_crop_analysis()` in `views.py`  
+  2. Load your trained model (TensorFlow, PyTorch, etc.)  
+  3. Process the uploaded image  
+  4. Return predictions with confidence scores  
 
-To integrate a real AI model:
-Replace the mock_crop_analysis() function in views.py
-Load your trained model (TensorFlow, PyTorch, etc.)
-Process the image through the model
-Return predictions with confidence scores
+---
 
-Deployment Checklist
- Set DEBUG = False in production
- Configure proper ALLOWED_HOSTS
- Set CORS_ALLOW_ALL_ORIGINS = False
- Configure specific CORS_ALLOWED_ORIGINS
- Set up proper static file serving
- Configure production database
- Set up environment variables for secrets
- Enable HTTPS
- Configure proper logging
+## Deployment Checklist
 
-Deliverables Status
-✅ /health endpoint implemented and tested
-✅ /analyze endpoint implemented and tested
-✅ Image validation (file type and size)
-✅ Error handling for all scenarios
-✅ Swagger documentation available at /docs
-✅ CORS enabled for frontend integration
-✅ Unit tests included
-✅ Ready for frontend integration
+- Set `DEBUG = False` in production  
+- Configure proper `ALLOWED_HOSTS`  
+- Set `CORS_ALLOW_ALL_ORIGINS = False` and specify `CORS_ALLOWED_ORIGINS`  
+- Serve static files properly  
+- Configure production database  
+- Set environment variables for secrets  
+- Enable HTTPS  
+- Configure proper logging  
 
-Support
-For issues or questions, please contact the development team.
+---
 
-License
-MIT License
+## Frontend Integration
+
+- CORS is enabled. Update `CORS_ALLOWED_ORIGINS` with frontend URL.  
+
+---
+
+## Deliverables Status ✅
+
+- `/health` endpoint implemented and tested  
+- `/analyze` endpoint implemented and tested  
+- Image validation (type & size) ✅  
+- Comprehensive error handling ✅  
+- Swagger documentation at `/docs` ✅  
+- CORS enabled ✅  
+- Unit tests included ✅  
+- Ready for frontend integration ✅  
+
+---
+
+## License
+
+- **MIT License**
 

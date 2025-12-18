@@ -11,6 +11,17 @@ import io # for in-memory file handling
 import random
 from django.http import HttpResponse
 
+from huggingface_hub import InferenceClient
+import io
+import os 
+from dotenv import load_dotenv
+
+load_dotenv()
+
+HF_TOKEN = os.getenv("HF_TOKEN")
+client = InferenceClient(token=HF_TOKEN)
+MODEL_ID = "wambugu71/crop_leaf_diseases_vit"
+
 # Create your views here.
 def index(request):
     return HttpResponse("Welcome to the SmartCrops API", status=200)
@@ -169,3 +180,47 @@ def analyze_with_ai_model(image):
         "confidence": float(predictions.max()),
         "recommendation": get_recommendations(predictions)
     }'''
+
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def diagnose_plant(request):
+    """
+    Django view to diagnose plant diseases from uploaded images
+    """
+    # Check if file was uploaded
+    if 'file' not in request.FILES:
+        return JsonResponse(
+            {"error": "No file provided"},
+            status=400
+        )
+    
+    file = request.FILES['file']
+    
+    # Validate file type
+    if not file.content_type.startswith("image/"):
+        return JsonResponse(
+            {"error": "File provided is not an image."},
+            status=400
+        )
+    
+    try:
+        # Read image data
+        image_data = file.read()
+        
+        # Get predictions from HuggingFace model
+        results = client.image_classification(image_data, model=MODEL_ID)
+        
+        # Return results
+        return JsonResponse({
+            "filename": file.name,
+            "top_prediction": results[0]["label"],
+            "confidence": f"{results[0]['score']:.2%}",
+            "all_results": results[:3]
+        })
+    
+    except Exception as e:
+        return JsonResponse(
+            {"error": str(e)},
+            status=500
+        )
