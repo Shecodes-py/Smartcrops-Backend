@@ -16,6 +16,9 @@ import io
 import os 
 from dotenv import load_dotenv
 
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
+
 load_dotenv()
 
 HF_TOKEN = os.getenv("HF_TOKEN")
@@ -23,9 +26,9 @@ client = InferenceClient(token=HF_TOKEN)
 MODEL_ID = "wambugu71/crop_leaf_diseases_vit"
 
 # Create your views here.
-
+@api_view(['GET'])
 def index(request):
-    return HttpResponse("Welcome to the SmartCrops API", status=200)
+    return Response("Welcome to the SmartCrops API", status=200)
 
 @api_view(['GET'])
 def health_check(request):
@@ -199,6 +202,19 @@ def analyze_with_ai_model(image):
 
 
 @csrf_exempt
+@swagger_auto_schema(
+    method='post',
+    manual_parameters=[
+        openapi.Parameter(
+            'file', 
+            openapi.IN_FORM, 
+            type=openapi.TYPE_FILE, 
+            description="Upload plant image"
+        )
+    ],
+    responses={200: 'Success'}
+)
+@parser_classes([MultiPartParser, FormParser])
 @api_view(['POST'])
 def diagnose_plant(request):
     """
@@ -228,15 +244,14 @@ def diagnose_plant(request):
         results = client.image_classification(image_data, model=MODEL_ID)
         
         # Return results
-        return JsonResponse({
-            "filename": file.name,
-            "top_prediction": results[0]["label"],
-            "confidence": f"{results[0]['score']:.2%}",
-            "all_results": results[:3]
-        })
+        return Response({
+        "filename": file.name,
+        "top_prediction": results[0]["label"],
+        "confidence": f"{results[0]['score']:.2%}",
+        "all_results": results[:3]
+    })
     
     except Exception as e:
-        return JsonResponse(
-            {"error": str(e)},
-            status=500
+        return Response(
+            {"error": str(e)}
         )
