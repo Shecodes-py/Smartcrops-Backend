@@ -23,10 +23,11 @@ client = InferenceClient(token=HF_TOKEN)
 MODEL_ID = "wambugu71/crop_leaf_diseases_vit"
 
 # Create your views here.
+
 def index(request):
     return HttpResponse("Welcome to the SmartCrops API", status=200)
 
-@require_http_methods(["GET"])
+@api_view(['GET'])
 def health_check(request):
 
     """
@@ -37,7 +38,7 @@ def health_check(request):
     return JsonResponse({"status": "ok"}, status=200)
 
 @api_view(['POST'])
-# @parser_classes([MultiPartParser, FormParser])
+@parser_classes([MultiPartParser, FormParser])
 def analyze_crop(request):
     """
     Accepts an uploaded crop image. 
@@ -199,6 +200,7 @@ def analyze_with_ai_model(image):
 
 @csrf_exempt
 @require_http_methods(["POST"])
+@api_view(['POST'])
 def diagnose_plant(request):
     """
     Django view to diagnose plant diseases from uploaded images
