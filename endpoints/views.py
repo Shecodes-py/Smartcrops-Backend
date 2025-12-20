@@ -201,33 +201,49 @@ def analyze_with_ai_model(image):
     }'''
 
 
-@csrf_exempt
-# @swagger_auto_schema(
-#     method='post',
-#     manual_parameters=[
-#         openapi.Parameter(
-#             'file', 
-#             openapi.IN_FORM, 
-#             type=openapi.TYPE_FILE, 
-#             description="Upload plant image"
-#         )
-#     ],
-#     responses={200: 'Success'}
-# )
-@parser_classes([MultiPartParser, FormParser])
+@swagger_auto_schema(
+    method='post',
+    manual_parameters=[
+        openapi.Parameter(
+            'image',            # This must match your request.FILES['image'] key
+            openapi.IN_FORM, 
+            type=openapi.TYPE_FILE, 
+            required=True,
+            description="Upload a crop image (JPEG/PNG)"
+        )
+    ],
+    responses={
+        200: openapi.Response(
+            description="Successful Analysis",
+            examples={
+                "application/json": {
+                    "analysis": {
+                        "issue": "Leaf blight",
+                        "confidence": 0.95,
+                        "recommendation": ["Reduce watering", "Apply fungicide"]
+                    },
+                    "message": "Image uploaded and validated successfully."
+                }
+            }
+        ),
+        400: "Invalid file or no image provided"
+    }
+)
 @api_view(['POST'])
+@parser_classes([MultiPartParser, FormParser])
+@csrf_exempt
 def diagnose_plant(request):
     """
     Django view to diagnose plant diseases from uploaded images
     """
     # Check if file was uploaded
-    if 'file' not in request.FILES:
+    if 'image' not in request.FILES:
         return JsonResponse(
             {"error": "No file provided"},
             status=400
         )
     
-    file = request.FILES['file']
+    file = request.FILES['image']
     
     # Validate file type
     if not file.content_type.startswith("image/"):
