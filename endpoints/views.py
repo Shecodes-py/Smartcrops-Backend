@@ -202,18 +202,18 @@ def analyze_with_ai_model(image):
 
 
 @csrf_exempt
-@swagger_auto_schema(
-    method='post',
-    manual_parameters=[
-        openapi.Parameter(
-            'file', 
-            openapi.IN_FORM, 
-            type=openapi.TYPE_FILE, 
-            description="Upload plant image"
-        )
-    ],
-    responses={200: 'Success'}
-)
+# @swagger_auto_schema(
+#     method='post',
+#     manual_parameters=[
+#         openapi.Parameter(
+#             'file', 
+#             openapi.IN_FORM, 
+#             type=openapi.TYPE_FILE, 
+#             description="Upload plant image"
+#         )
+#     ],
+#     responses={200: 'Success'}
+# )
 @parser_classes([MultiPartParser, FormParser])
 @api_view(['POST'])
 def diagnose_plant(request):
